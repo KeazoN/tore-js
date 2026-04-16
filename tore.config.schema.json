@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://tore-js.dev/schemas/tore.config.json",
-  "title": "Tore JS configuration",
+  "title": "Töre JS configuration",
   "description": "AST-based architectural rules for AI-assisted code (constitution file).",
   "type": "object",
   "additionalProperties": false,

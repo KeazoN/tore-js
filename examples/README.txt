@@ -1,4 +1,5 @@
-Tore JS — sample configuration files
+Töre JS — sample configuration files
+Logo: https://hizliresim.com/4l9u0a3.png
 ====================================
 
 minimal-tore.config.json

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://hizliresim.com/4l9u0a3.png" alt="Töre JS" width="200" />
+</p>
+
 # Contributing to Töre JS
 
 ## Prerequisites

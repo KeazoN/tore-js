@@ -1,4 +1,6 @@
-# Töre JS
+<p align="center">
+  <img src="https://hizliresim.com/4l9u0a3.png" alt="Töre JS" width="280" />
+</p>
 
 **Töre JS** is an AST-based CLI that enforces architectural rules on TypeScript and TSX code—useful when AI-assisted workflows generate code that should still match your stack (React, Next.js-style layouts, design-system components, no `any`, no inline styles, and more).
 
