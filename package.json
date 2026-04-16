@@ -1,6 +1,6 @@
 {
   "name": "@keazon/tore-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Töre JS — AST-based architectural guardian CLI for AI-assisted TypeScript and React codebases",
   "type": "module",
   "bin": {
