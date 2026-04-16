@@ -2,7 +2,7 @@ Töre JS (@keazon/tore-js npm package) — project layout
 ===================================
 
 Branding
-  Logo (README, CONTRIBUTING): https://hizliresim.com/4l9u0a3.png
+  Logo (README, CONTRIBUTING): https://i.hizliresim.com/4l9u0a3.png
 
 Root
   package.json              Package manifest; bin "tore" -> dist/cli.mjs (after build)
