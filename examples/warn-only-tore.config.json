@@ -1,0 +1,21 @@
+{
+  "$schema": "../tore.config.schema.json",
+  "include": ["src/**/*.{ts,tsx}"],
+  "exclude": ["**/node_modules/**"],
+  "rules": {
+    "noInlineStyle": { "severity": "warn" },
+    "noExplicitAny": { "severity": "warn" },
+    "forbiddenIntrinsicElements": {
+      "severity": "warn",
+      "elements": {
+        "button": "Consider migrating to a shared Button component.",
+        "img": "Consider next/image for optimization."
+      },
+      "allowedReplacements": {
+        "button": "@/ui/Button",
+        "img": "next/image"
+      }
+    }
+  },
+  "security": { "maskEnvLikeStrings": false }
+}

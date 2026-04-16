@@ -1,0 +1,16 @@
+{
+  "$schema": "./tore.config.schema.json",
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["**/node_modules/**"],
+  "rules": {
+    "noInlineStyle": { "severity": "off" },
+    "noExplicitAny": { "severity": "error" },
+    "forbiddenIntrinsicElements": {
+      "severity": "off",
+      "elements": {}
+    }
+  },
+  "security": {
+    "maskEnvLikeStrings": false
+  }
+}

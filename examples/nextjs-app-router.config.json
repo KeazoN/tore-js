@@ -1,0 +1,28 @@
+{
+  "$schema": "../tore.config.schema.json",
+  "version": "1.0.0",
+  "include": ["app/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
+  "exclude": ["**/node_modules/**", "**/.next/**"],
+  "rules": {
+    "noInlineStyle": { "severity": "error" },
+    "noExplicitAny": { "severity": "error" },
+    "forbiddenIntrinsicElements": {
+      "severity": "error",
+      "elements": {
+        "button": "Use @/components/ui/button",
+        "img": "Use next/image"
+      },
+      "allowedReplacements": {
+        "button": "@/components/ui/button",
+        "img": "next/image"
+      }
+    },
+    "componentFileLocation": {
+      "severity": "error",
+      "include": ["src/**/*.tsx"],
+      "exclude": ["**/app/**", "**/*.test.tsx"],
+      "allowedPathGlobs": ["**/components/**/*.tsx"]
+    }
+  },
+  "security": { "maskEnvLikeStrings": true }
+}

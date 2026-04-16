@@ -1,0 +1,56 @@
+Tore JS (tore-js) — project layout
+===================================
+
+Root
+  package.json              Package manifest; bin "tore" -> dist/cli.mjs (after build)
+  package-lock.json         Dependency lockfile
+  LICENSE                   MIT license text
+  README.md                 User-facing and npm landing documentation
+  CONTRIBUTING.md           Contributor workflow (also published on npm)
+  tsconfig.json             Strict TypeScript; paths @/* -> src/*
+  tore.config.json          Local constitution for scanning this repository
+  tore.config.schema.json   JSON Schema for tore.config.json (IDE + validation)
+  tore.config.example.json  Full example constitution for consumer apps
+  project-hierarchy.txt       This file
+  .gitignore                Ignores node_modules, dist, logs, env files
+
+.github/workflows/
+  ci.yml                    CI: npm ci, build, typecheck, Node smoke check, Bun tests
+
+scripts/
+  build.mjs                 esbuild bundle -> dist/cli.mjs (Node shebang; deps external)
+
+examples/
+  README.txt                Describes each sample config
+  minimal-tore.config.json  Empty {} — all defaults
+  nextjs-app-router.config.json  Strict Next.js App Router oriented sample
+  warn-only-tore.config.json     All relevant rules at "warn" severity
+
+dist/                       Build output (generated; not committed; included in npm pack)
+
+src/
+  cli/
+    index.ts                CLI entry: argv, check command, exit codes
+  config/
+    tore-config.zod.ts      Zod schema + defaults (runtime mirror of JSON Schema)
+    load.ts                 Discover tore.config.json (walk up from cwd), parse
+  engine/
+    create-project.ts       ts-morph Project factory for scanned TS/TSX files
+    run-check.ts            Glob discovery, parse files, run rules, build report
+  rules/
+    no-inline-style.ts           Forbid JSX style={{ ... }}
+    no-any.ts                    Forbid explicit any / as any
+    forbidden-jsx-intrinsic.ts   Forbid raw intrinsics per config
+    component-location.ts        Path globs: TSX under include must match allowed paths
+    index.ts                     Re-exports rule runners
+  report/
+    types.ts                CheckReport / summary types
+    emit.ts                 JSON stdout + optional env-like masking on snippets
+  types/
+    violation.ts            Violation record shape
+    picomatch.d.ts          Ambient types for picomatch (no bundled .d.ts)
+
+tests/
+  *.test.ts                 Bun tests with in-memory ts-morph fixtures
+
+node_modules/               Installed dependencies (generated)

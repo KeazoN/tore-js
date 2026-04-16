@@ -1,0 +1,67 @@
+{
+  "name": "tore-js",
+  "version": "0.1.0",
+  "description": "AST-based architectural guardian CLI for AI-assisted TypeScript and React codebases",
+  "type": "module",
+  "bin": {
+    "tore": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist",
+    "tore.config.schema.json",
+    "tore.config.example.json",
+    "examples",
+    "README.md",
+    "CONTRIBUTING.md",
+    "LICENSE"
+  ],
+  "exports": {
+    "./tore.config.schema.json": "./tore.config.schema.json"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build && node ./dist/cli.mjs check",
+    "tore": "bun run src/cli/index.ts",
+    "check": "node ./dist/cli.mjs check",
+    "check:dev": "bun run src/cli/index.ts check",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KeazoN/tore-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KeazoN/tore-js/issues"
+  },
+  "homepage": "https://github.com/KeazoN/tore-js#readme",
+  "keywords": [
+    "ast",
+    "lint",
+    "cli",
+    "architecture",
+    "typescript",
+    "react",
+    "jsx",
+    "ai",
+    "code-quality",
+    "ts-morph"
+  ],
+  "dependencies": {
+    "fast-glob": "^3.3.3",
+    "picomatch": "^4.0.2",
+    "ts-morph": "^25.0.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2"
+  },
+  "license": "MIT",
+  "author": "Ugur Mercan"
+}

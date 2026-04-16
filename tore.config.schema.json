@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tore-js.dev/schemas/tore.config.json",
+  "title": "Tore JS configuration",
+  "description": "AST-based architectural rules for AI-assisted code (constitution file).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema URI for editor support."
+    },
+    "version": {
+      "description": "Config format version for future migrations.",
+      "oneOf": [{ "type": "string" }, { "type": "number" }]
+    },
+    "include": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Glob patterns for files to scan when no CLI paths are passed.",
+      "default": ["src/**/*.{ts,tsx}"]
+    },
+    "exclude": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Glob patterns excluded from scanning.",
+      "default": ["**/node_modules/**", "**/dist/**", "**/.next/**"]
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "noInlineStyle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "severity": {
+              "type": "string",
+              "enum": ["error", "warn", "off"],
+              "default": "error"
+            }
+          }
+        },
+        "noExplicitAny": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "severity": {
+              "type": "string",
+              "enum": ["error", "warn", "off"],
+              "default": "error"
+            }
+          }
+        },
+        "forbiddenIntrinsicElements": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "severity": {
+              "type": "string",
+              "enum": ["error", "warn", "off"],
+              "default": "error"
+            },
+            "elements": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Intrinsic tag name (lowercase) → violation message."
+            },
+            "allowedReplacements": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Optional tag → hint text for AI resolution."
+            }
+          },
+          "required": ["elements"]
+        },
+        "componentFileLocation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "severity": {
+              "type": "string",
+              "enum": ["error", "warn", "off"],
+              "default": "error"
+            },
+            "include": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Files matching any of these globs are subject to the rule.",
+              "default": ["src/**/*.tsx"]
+            },
+            "exclude": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Globs excluded from this rule even if they match include.",
+              "default": ["**/*.test.tsx", "**/*.spec.tsx"]
+            },
+            "allowedPathGlobs": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "File path (posix) must match at least one glob.",
+              "default": ["**/components/**/*.tsx"]
+            }
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maskEnvLikeStrings": {
+          "type": "boolean",
+          "description": "Redact snippets that look like env secrets in reports.",
+          "default": false
+        }
+      }
+    }
+  }
+}
