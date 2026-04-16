@@ -1,4 +1,4 @@
-Tore JS (tore-js) — project layout
+Tore JS (@keazon/tore-js npm package) — project layout
 ===================================
 
 Root

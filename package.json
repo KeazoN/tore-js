@@ -1,10 +1,13 @@
 {
-  "name": "tore-js",
+  "name": "@keazon/tore-js",
   "version": "0.1.0",
   "description": "AST-based architectural guardian CLI for AI-assisted TypeScript and React codebases",
   "type": "module",
   "bin": {
-    "tore": "./dist/cli.mjs"
+    "tore": "dist/cli.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist",

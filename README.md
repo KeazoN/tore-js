@@ -1,6 +1,8 @@
-# Tore JS
+# Töre JS
 
-**Tore JS** (`tore-js`) is an AST-based CLI that enforces architectural rules on TypeScript and TSX code—useful when AI-assisted workflows generate code that should still match your stack (React, Next.js-style layouts, design-system components, no `any`, no inline styles, and more).
+**Töre JS** is an AST-based CLI that enforces architectural rules on TypeScript and TSX code—useful when AI-assisted workflows generate code that should still match your stack (React, Next.js-style layouts, design-system components, no `any`, no inline styles, and more).
+
+**npm package:** [`@keazon/tore-js`](https://www.npmjs.com/package/@keazon/tore-js) (scoped name required by the registry: unscoped `tore-js` is rejected as too similar to the existing [`tore.js`](https://www.npmjs.com/package/tore.js) package). The **CLI command remains `tore`** after a global install.
 
 Rules are driven by a single constitution file: **`tore.config.json`**.
 
@@ -21,7 +23,7 @@ Rules are driven by a single constitution file: **`tore.config.json`**.
 ### npm (global CLI)
 
 ```bash
-npm install -g tore-js
+npm install -g @keazon/tore-js
 ```
 
 Then:
@@ -33,7 +35,7 @@ tore check
 ### npx (no global install)
 
 ```bash
-npx tore-js check
+npx --yes --package=@keazon/tore-js tore check
 ```
 
 ### From source (contributors)
@@ -68,7 +70,7 @@ bun test
 
    ```json
    {
-     "$schema": "https://unpkg.com/tore-js@latest/tore.config.schema.json"
+     "$schema": "https://unpkg.com/@keazon/tore-js@latest/tore.config.schema.json"
    }
    ```
 
@@ -183,7 +185,7 @@ Each rule supports `severity`: `"error"`, `"warn"`, or `"off"`.
 1. Update `version` in `package.json` (semver).
 2. Run `npm run typecheck`, `npm run build`, `bun test`, and `node dist/cli.mjs check`.
 3. Ensure `repository` / `homepage` / `bugs` in `package.json` match the repo you publish from (canonical: `KeazoN/tore-js`).
-4. `npm publish` (runs `prepublishOnly`: build + smoke `check`).
+4. `npm publish` — `publishConfig.access` is already `"public"` for the scoped name `@keazon/tore-js`. This runs `prepublishOnly` (build + smoke `check`).
 
 The published package ships **`dist/cli.mjs`** plus `dependencies`; it does **not** ship TypeScript sources.
 

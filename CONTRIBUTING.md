@@ -1,4 +1,4 @@
-# Contributing to Tore JS
+# Contributing to Töre JS
 
 ## Prerequisites
 
