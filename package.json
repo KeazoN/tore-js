@@ -1,6 +1,6 @@
 {
   "name": "@keazon/tore-js",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Töre JS — AST-based architectural guardian for TypeScript/React: team-level rules that complement ESLint (design system boundaries, risky patterns from AI-assisted edits). CLI: tore check, tore init.",
   "type": "module",
   "bin": {
