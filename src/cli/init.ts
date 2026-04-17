@@ -2,6 +2,17 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/** Replaces the repo-relative schema in the example so consumer projects get IDE validation without copying the file. */
+export const PUBLISHED_CONFIG_SCHEMA_URL =
+  "https://unpkg.com/@keazon/tore-js@latest/tore.config.schema.json";
+
+function rewriteSchemaForInitOutput(content: string): string {
+  return content.replace(
+    /"\$schema"\s*:\s*"\.\/tore\.config\.schema\.json"/,
+    `"$schema": "${PUBLISHED_CONFIG_SCHEMA_URL}"`,
+  );
+}
+
 /**
  * Resolves tore.config.example.json next to the installed package (dist/) or dev tree (src/cli/).
  */
@@ -38,6 +49,7 @@ export async function runInit(options: { cwd: string; force: boolean }): Promise
     throw new Error(`${target} already exists. Pass --force to overwrite.`);
   }
   const examplePath = resolvePublishedExampleConfigPath();
-  const content = readFileSync(examplePath, "utf8");
+  const raw = readFileSync(examplePath, "utf8");
+  const content = rewriteSchemaForInitOutput(raw);
   writeFileSync(target, content, "utf8");
 }

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - README: consumer GitHub Actions example, `package.json` script snippet, concrete violation JSON example, and clearer Node vs Bun wording.
+- `tore init` now rewrites `$schema` to the published unpkg URL so editors validate without a local `tore.config.schema.json` copy.
 
 ## [0.1.3]
 

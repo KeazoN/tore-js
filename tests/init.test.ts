@@ -25,7 +25,7 @@ describe("runInit", () => {
       expect(existsSync(created)).toBe(true);
       const text = readFileSync(created, "utf8");
       expect(text).toContain('"rules"');
-      expect(text).toContain("$schema");
+      expect(text).toContain("unpkg.com/@keazon/tore-js@latest/tore.config.schema.json");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
