@@ -1,13 +1,18 @@
 import { loadToreConfig } from "../config/load";
 import { runCheck } from "../engine/run-check";
-import { emitReportJson } from "../report/emit";
+import { emitGitHubWorkflowCommands, emitReportJson } from "../report/emit";
+import { parseInitArgs, runInit } from "./init";
+
+type ReportFormat = "json" | "github";
 
 function parseCheckArgs(argv: string[]): {
   filePatterns: string[];
   configPath?: string;
+  format: ReportFormat;
 } {
   const filePatterns: string[] = [];
   let configPath: string | undefined;
+  let format: ReportFormat = "json";
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === undefined) {
@@ -22,21 +27,42 @@ function parseCheckArgs(argv: string[]): {
       i++;
       continue;
     }
+    if (arg === "--format") {
+      const next = argv[i + 1];
+      if (!next) {
+        throw new Error('--format requires "json" or "github".');
+      }
+      if (next !== "json" && next !== "github") {
+        throw new Error('--format must be "json" or "github".');
+      }
+      format = next;
+      i++;
+      continue;
+    }
     filePatterns.push(arg);
   }
-  return { filePatterns, configPath };
+  return { filePatterns, configPath, format };
 }
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   const command = argv[0];
+  if (command === "init") {
+    const { force } = parseInitArgs(argv.slice(1));
+    await runInit({ cwd: process.cwd(), force });
+    console.error("Wrote tore.config.json");
+    process.exit(0);
+    return;
+  }
   if (command !== "check") {
-    console.error("Usage: tore check [--config <path>] [globs-or-files...]");
+    console.error(
+      "Usage: tore check [--config <path>] [--format json|github] [globs-or-files...]\n       tore init [--force]",
+    );
     process.exit(2);
   }
 
   const cwd = process.cwd();
-  const { filePatterns, configPath } = parseCheckArgs(argv.slice(1));
+  const { filePatterns, configPath, format } = parseCheckArgs(argv.slice(1));
   const { config } = loadToreConfig({ cwd, configPath });
 
   const report = await runCheck({
@@ -45,7 +71,11 @@ async function main(): Promise<void> {
     filePatterns: filePatterns.length > 0 ? filePatterns : undefined,
   });
 
-  process.stdout.write(emitReportJson(report));
+  if (format === "github") {
+    process.stdout.write(emitGitHubWorkflowCommands(report));
+  } else {
+    process.stdout.write(emitReportJson(report));
+  }
   process.exit(report.ok ? 0 : 1);
 }
 

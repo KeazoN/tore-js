@@ -14,9 +14,10 @@ Rules are driven by a single constitution file: **`tore.config.json`**.
 
 - **AST analysis** via [ts-morph](https://github.com/dsherret/ts-morph) (not regex-only linting).
 - **Configurable rules**: inline `style`, explicit `any`, forbidden JSX intrinsics (e.g. raw `<button>`, `<img>`), component path placement via globs.
-- **Machine-readable reports**: JSON on stdout for agents and CI.
+- **Machine-readable reports**: JSON on stdout by default; optional GitHub Actions workflow commands via `--format github` for PR annotations.
+- **`tore init`**: scaffold `tore.config.json` from the published example template.
 - **Optional redaction** of env-like strings in violation snippets.
-- **Node 18+** runtime for the published CLI bundle; **Bun** recommended for local development and tests.
+- **Node 18+** runtime for the published CLI bundle. **Bun** is only needed to run the unit tests in this repository (`bun test`); you do **not** need Bun to install or run `tore` from npm.
 
 ---
 
@@ -58,11 +59,27 @@ Unit tests require [Bun](https://bun.sh):
 bun test
 ```
 
+If Bun is installed but not on your `PATH`, use:
+
+```bash
+npm exec -- bun test
+```
+
 ---
 
 ## Quick start
 
-1. Copy the example constitution (or start from `{}`—defaults apply):
+1. Create a constitution file:
+
+   **Option A — CLI scaffold** (after installing the package globally, or via `npx`):
+
+   ```bash
+   npx --yes --package=@keazon/tore-js tore init
+   ```
+
+   If `tore.config.json` already exists, use `tore init --force` to overwrite it.
+
+   **Option B — copy manually** (or start from `{}`—defaults apply):
 
    ```bash
    cp tore.config.example.json tore.config.json
@@ -90,14 +107,95 @@ bun test
    tore check "src/components/**/*.tsx"
    ```
 
+### Run from `package.json` scripts
+
+```json
+{
+  "scripts": {
+    "lint:constitution": "tore check"
+  }
+}
+```
+
+Then: `npm run lint:constitution` (or `pnpm` / `yarn` equivalent). To avoid a global install, use:
+
+```json
+{
+  "scripts": {
+    "lint:constitution": "npx --yes --package=@keazon/tore-js tore check"
+  }
+}
+```
+
+### CI (GitHub Actions)
+
+Example job that installs your app dependencies, checks out the repo, and runs Töre with **npx** (no global `npm install -g`):
+
+```yaml
+jobs:
+  tore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Architectural rules (Töre)
+        run: npx --yes --package=@keazon/tore-js tore check
+```
+
+Add `--format github` to that command if you want GitHub Actions workflow annotations in the job log (see [Report format](#report-format)).
+
+If you use **pnpm** or **Yarn**, replace `npm ci` with `pnpm install --frozen-lockfile` or `yarn install --frozen-lockfile` and keep the `npx ... tore check` step as shown (or call the local binary from your devDependencies if you add `@keazon/tore-js` to the project).
+
+### Example: violation JSON shape
+
+Given a component with an inline style:
+
+```tsx
+// src/App.tsx
+export function App() {
+  return <div style={{ color: "red" }}>Hello</div>;
+}
+```
+
+A failing report uses **top-level** `line` and `column` on each violation (not a nested `loc` object), for example:
+
+```json
+{
+  "ok": false,
+  "violations": [
+    {
+      "ruleId": "no-inline-style",
+      "severity": "error",
+      "message": "…",
+      "file": "/absolute/path/to/src/App.tsx",
+      "line": 3,
+      "column": 16,
+      "snippet": "…"
+    }
+  ],
+  "summary": {
+    "filesScanned": 5,
+    "errorCount": 1,
+    "warnCount": 0
+  }
+}
+```
+
 ---
 
 ## CLI reference
 
 | Command | Description |
 | --- | --- |
-| `tore check` | Scan files (config `include` / `exclude`, or extra globs after `check`) and print a JSON report. |
+| `tore init` | Write `tore.config.json` in the current directory using the published [`tore.config.example.json`](./tore.config.example.json) template. Fails with exit code `2` if the file already exists unless you pass `--force`. |
+| `tore check` | Scan files (config `include` / `exclude`, or extra globs after `check`) and print a report to stdout (see `--format`). |
 | `tore check --config ./path/tore.config.json` | Use an explicit config file. |
+| `tore check --format json` | Print the JSON report (this is the default). |
+| `tore check --format github` | Print [GitHub Actions workflow commands](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions) (one line per violation) instead of JSON. Useful for PR annotations in CI. |
 
 ### Exit codes
 
@@ -105,11 +203,13 @@ bun test
 | --- | --- |
 | `0` | No violations with severity `error`. |
 | `1` | One or more `error` violations. |
-| `2` | Misuse (e.g. unknown command) or thrown error (invalid config, missing file). |
+| `2` | Misuse (e.g. unknown command), thrown error (invalid config, missing file), or `tore init` when `tore.config.json` already exists without `--force`. |
 
 ---
 
 ## Report format
+
+### JSON (default)
 
 Stdout is a single JSON object:
 
@@ -136,6 +236,16 @@ Stdout is a single JSON object:
 ```
 
 When `security.maskEnvLikeStrings` is `true`, snippets that look like secrets may be replaced with `[REDACTED]`.
+
+### GitHub Actions (`--format github`)
+
+With `tore check --format github`, stdout contains one workflow command per violation (errors use `::error`, warnings use `::warning`), each including `file`, `line`, and `col`. There is no JSON payload in this mode. Example:
+
+```text
+::error file=/home/runner/work/app/src/App.tsx,line=3,col=16::Inline JSX styles are not allowed.
+```
+
+In a workflow job, a failing `tore check` step still fails the job when violations have severity `error`, while annotations show up on the PR diff when GitHub parses these lines from the log.
 
 ---
 
@@ -178,18 +288,34 @@ Each rule supports `severity`: `"error"`, `"warn"`, or `"off"`.
 2. **Discover files** — Uses [fast-glob](https://github.com/mrmlnc/fast-glob) with `include` / `exclude` (or CLI globs).
 3. **Parse** — Builds one [ts-morph](https://github.com/dsherret/ts-morph) `Project` and adds each file.
 4. **Run rules** — Each rule inspects the AST and appends violations.
-5. **Emit** — JSON report and process exit code.
+5. **Emit** — JSON report (default) or GitHub workflow commands (`--format github`) and process exit code.
+
+---
+
+## Roadmap
+
+This is a direction of travel, not a release commitment.
+
+- **Docs and discoverability** — Keep [CHANGELOG.md](./CHANGELOG.md) updated, expand CI and onboarding examples in the README, and keep the JSON report shape explicit for tooling authors.
+- **Community** — Issue and pull request templates, a code of conduct, and clearer guidance for contributors who want to add rules (see [CONTRIBUTING.md](./CONTRIBUTING.md)).
+- **Onboarding** — `tore init` to scaffold `tore.config.json` from the published example (see Quick start).
+- **Enterprise-style CI** — Optional `tore check --format github` for GitHub Actions workflow commands (PR annotations).
+- **Optional follow-ups** — A supported programmatic Node API could be added later; today the tool is **CLI-only** (see [Programmatic API](#programmatic-api)). CI may surface `npm audit` at high severity as a non-blocking signal.
 
 ---
 
 ## Publishing checklist (maintainers)
 
-1. Update `version` in `package.json` (semver).
+1. Update `version` in `package.json` (semver) and summarize user-visible changes in [CHANGELOG.md](./CHANGELOG.md).
 2. Run `npm run typecheck`, `npm run build`, `bun test`, and `node dist/cli.mjs check`.
 3. Ensure `repository` / `homepage` / `bugs` in `package.json` match the repo you publish from (canonical: `KeazoN/tore-js`).
 4. `npm publish` — `publishConfig.access` is already `"public"` for the scoped name `@keazon/tore-js`. This runs `prepublishOnly` (build + smoke `check`).
 
 The published package ships **`dist/cli.mjs`** plus `dependencies`; it does **not** ship TypeScript sources.
+
+### Programmatic API
+
+This package is distributed as a **CLI** (`tore` binary). There is **no** supported `import "@keazon/tore-js"` or `require("@keazon/tore-js")` API surface today. For automation, run `tore check` as a subprocess and parse JSON from stdout (or use `--format github` in GitHub Actions).
 
 ---
 
@@ -209,4 +335,8 @@ MIT — see [LICENSE](./LICENSE).
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md).

@@ -5,6 +5,8 @@ Branding
   Logo (README, CONTRIBUTING): https://i.hizliresim.com/4l9u0a3.png
 
 Root
+  CHANGELOG.md              Keep a Changelog–style release notes (published on npm)
+  CODE_OF_CONDUCT.md        Contributor Covenant code of conduct (published on npm)
   package.json              Package manifest; bin "tore" -> dist/cli.mjs (after build)
   package-lock.json         Dependency lockfile
   LICENSE                   MIT license text
@@ -17,8 +19,10 @@ Root
   project-hierarchy.txt       This file
   .gitignore                Ignores node_modules, dist, logs, env files
 
-.github/workflows/
-  ci.yml                    CI: npm ci, build, typecheck, Node smoke check, Bun tests
+.github/
+  workflows/ci.yml          CI: npm ci, optional npm audit, build, typecheck, Node smoke, Bun tests
+  ISSUE_TEMPLATE/           Bug and feature/rule issue templates
+  pull_request_template.md  PR checklist for contributors
 
 scripts/
   build.mjs                 esbuild bundle -> dist/cli.mjs (Node shebang; deps external)
@@ -33,7 +37,8 @@ dist/                       Build output (generated; not committed; included in 
 
 src/
   cli/
-    index.ts                CLI entry: argv, check command, exit codes
+    index.ts                CLI entry: argv, init + check, exit codes
+    init.ts                 tore init: scaffold tore.config.json from example template
   config/
     tore-config.zod.ts      Zod schema + defaults (runtime mirror of JSON Schema)
     load.ts                 Discover tore.config.json (walk up from cwd), parse
@@ -48,12 +53,14 @@ src/
     index.ts                     Re-exports rule runners
   report/
     types.ts                CheckReport / summary types
-    emit.ts                 JSON stdout + optional env-like masking on snippets
+    emit.ts                 JSON stdout, GitHub workflow commands, env-like masking on snippets
   types/
     violation.ts            Violation record shape
     picomatch.d.ts          Ambient types for picomatch (no bundled .d.ts)
 
 tests/
-  *.test.ts                 Bun tests with in-memory ts-morph fixtures
+  rules.test.ts             Rule fixtures (ts-morph in-memory)
+  init.test.ts              tore init scaffolding
+  emit-github.test.ts       GitHub workflow command serialization
 
 node_modules/               Installed dependencies (generated)

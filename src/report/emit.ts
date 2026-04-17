@@ -2,6 +2,10 @@ import type { ToreConfig } from "../config/tore-config.zod";
 import type { Violation } from "../types/violation";
 import type { CheckReport } from "./types";
 
+function escapeGitHubWorkflowMessage(message: string): string {
+  return message.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+}
+
 const envLikeSnippet = /(API_KEY|SECRET|TOKEN|PASSWORD|BEARER)\s*=\s*\S+/i;
 
 export function maskSnippetIfNeeded(
@@ -47,4 +51,17 @@ export function buildReport(violations: Violation[], filesScanned: number): Chec
 
 export function emitReportJson(report: CheckReport): string {
   return `${JSON.stringify(report, null, 2)}\n`;
+}
+
+/**
+ * GitHub Actions workflow commands for PR annotations (stdout).
+ * See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
+ */
+export function emitGitHubWorkflowCommands(report: CheckReport): string {
+  const lines = report.violations.map((v) => {
+    const kind = v.severity === "error" ? "error" : "warning";
+    const msg = escapeGitHubWorkflowMessage(v.message);
+    return `::${kind} file=${v.file},line=${v.line},col=${v.column}::${msg}`;
+  });
+  return lines.length > 0 ? `${lines.join("\n")}\n` : "";
 }
