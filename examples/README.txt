@@ -13,4 +13,9 @@ warn-only-tore.config.json
 
 See also ../tore.config.example.json at the repository root for the most complete template.
 
+CLI presets (same shapes as some files here):
+  tore init --preset default   → full example (tore.config.example.json)
+  tore init --preset next      → mirrors nextjs-app-router.config.json
+  tore init --preset warn-first → mirrors warn-only-tore.config.json
+
 Note: JSON does not support comments; this file carries human-readable notes only.

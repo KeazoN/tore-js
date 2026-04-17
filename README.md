@@ -2,7 +2,7 @@
   <img src="https://i.hizliresim.com/4l9u0a3.png" alt="Töre JS" width="280" />
 </p>
 
-**Töre JS** is an AST-based CLI that enforces architectural rules on TypeScript and TSX code—useful when AI-assisted workflows generate code that should still match your stack (React, Next.js-style layouts, design-system components, no `any`, no inline styles, and more).
+**Töre JS** is an AST-based **architectural guardian** CLI for TypeScript and TSX: it encodes team-level rules (design-system boundaries, Next-style layout habits, no `any`, no inline styles, and more). It **complements ESLint and TypeScript**—use ESLint for general linting and Töre for constitution-style checks, especially when **AI-assisted** edits should still match your stack.
 
 Scans TypeScript and TSX files and reports what breaks your rules (for example `style={{}}`, `any`, raw `<button>`). One config file: **`tore.config.json`**.
 
@@ -36,7 +36,9 @@ npx --yes --package=@keazon/tore-js tore check
    npx --yes --package=@keazon/tore-js tore init
    ```
 
-   This copies the example constitution and sets `$schema` to the **published** JSON Schema on unpkg so your editor can autocomplete **without** copying `tore.config.schema.json` into your app.
+   **Presets:** `tore init --preset next` (Next.js App Router–oriented) or `tore init --preset warn-first` (same shapes, severities mostly `warn` for gradual rollout). Omit `--preset` for the full default template (same as `tore init --preset default`).
+
+   This copies the chosen template and sets `$schema` to the **published** JSON Schema on unpkg so your editor can autocomplete **without** copying `tore.config.schema.json` into your app.
 
    If `tore.config.json` already exists, use `tore init --force` to overwrite. If you do **not** use `tore init`, copy `tore.config.example.json` yourself and either keep `"$schema": "./tore.config.schema.json"` (and copy the schema file next to it) or set `$schema` to `https://unpkg.com/@keazon/tore-js@latest/tore.config.schema.json`.
 
@@ -68,7 +70,9 @@ Then: `npm run tore`
 
 | Command | What it does |
 | --- | --- |
-| `tore init` | Writes `tore.config.json` from the published example template. |
+| `tore init` | Writes `tore.config.json` from the published example template (`--preset default`). |
+| `tore init --preset next` | Next.js App Router–oriented preset (see `presets/` in the repo). |
+| `tore init --preset warn-first` | Gradual rollout: key rules at `warn` severity. |
 | `tore init --force` | Overwrites if the file already exists. |
 | `tore check` | Scans and prints **JSON** to stdout. |
 | `tore check --config path/to/tore.config.json` | Use another config file. |
@@ -152,7 +156,7 @@ None. CLI only: run it in a shell and read JSON (or use `--format github` in Act
 
 ## Roadmap (not a release promise)
 
-CHANGELOG, community templates, `tore init`, GitHub output format, optional Node API later — see [CHANGELOG.md](./CHANGELOG.md) and [CONTRIBUTING.md](./CONTRIBUTING.md).
+Shipped: `tore init`, presets, GitHub output format, community templates. **Next directions** (detail: [docs/ROADMAP.md](./docs/ROADMAP.md)): optional **Node API**, **SARIF** and richer CI reporting, **performance** (large monorepos / changed-files mode; parser story in README limits). See [CHANGELOG.md](./CHANGELOG.md), [docs/RULE_BACKLOG.md](./docs/RULE_BACKLOG.md), and [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 

@@ -7,7 +7,7 @@ labels: bug
 
 ## Summary
 
-<!-- What went wrong? -->
+<!-- What went wrong? For rule behavior, note whether the same case is intentionally out of scope for Töre (architectural guardian vs ESLint). -->
 
 ## Environment
 

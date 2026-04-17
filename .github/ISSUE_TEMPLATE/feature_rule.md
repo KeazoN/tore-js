@@ -5,6 +5,10 @@ title: "[feature] "
 labels: enhancement
 ---
 
+## Scope (Töre vs ESLint)
+
+Töre targets **architecture / policy** checks (constitution-as-code), not naming or import sorting. If ESLint already solves it well, link that rule instead.
+
 ## Problem
 
 <!-- What workflow or codebase pain should this address? -->

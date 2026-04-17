@@ -48,15 +48,20 @@ async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   const command = argv[0];
   if (command === "init") {
-    const { force } = parseInitArgs(argv.slice(1));
-    await runInit({ cwd: process.cwd(), force });
-    console.error("Wrote tore.config.json");
+    const { force, preset } = parseInitArgs(argv.slice(1));
+    const { preset: used } = await runInit({
+      cwd: process.cwd(),
+      force,
+      preset,
+    });
+    const suffix = used === "default" ? "" : ` (preset: ${used})`;
+    console.error(`Wrote tore.config.json${suffix}`);
     process.exit(0);
     return;
   }
   if (command !== "check") {
     console.error(
-      "Usage: tore check [--config <path>] [--format json|github] [globs-or-files...]\n       tore init [--force]",
+      'Usage: tore check [--config <path>] [--format json|github] [globs-or-files...]\n       tore init [--force] [--preset default|next|warn-first]',
     );
     process.exit(2);
   }

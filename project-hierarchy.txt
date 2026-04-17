@@ -16,6 +16,8 @@ Root
   tore.config.json          Local constitution for scanning this repository
   tore.config.schema.json   JSON Schema for tore.config.json (IDE + validation)
   tore.config.example.json  Full example constitution for consumer apps
+  presets/                  Built-in tore init templates (next, warn-first)
+  docs/                     RULE_BACKLOG.md, ROADMAP.md
   project-hierarchy.txt       This file
   .gitignore                Ignores node_modules, dist, logs, env files
 
@@ -38,7 +40,7 @@ dist/                       Build output (generated; not committed; included in 
 src/
   cli/
     index.ts                CLI entry: argv, init + check, exit codes
-    init.ts                 tore init: scaffold tore.config.json from example template
+    init.ts                 tore init: scaffold tore.config.json (example + presets/)
   config/
     tore-config.zod.ts      Zod schema + defaults (runtime mirror of JSON Schema)
     load.ts                 Discover tore.config.json (walk up from cwd), parse

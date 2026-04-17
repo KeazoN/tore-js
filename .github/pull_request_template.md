@@ -1,6 +1,6 @@
 ## What changed
 
-<!-- Short description for reviewers. -->
+<!-- Short description for reviewers. For doc-only changes: align with Töre as ESLint-complementing architectural guardian (see CONTRIBUTING). -->
 
 ## Checklist
 

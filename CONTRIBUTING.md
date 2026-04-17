@@ -4,6 +4,8 @@
 
 # Contributing to Töre JS
 
+**Product positioning:** Töre is an **architectural guardian** layer on top of TypeScript ASTs. It complements **ESLint** and **TypeScript**—it does not replace them. Prefer rules that encode **team constitution** (design-system boundaries, layout conventions, patterns common in **AI-assisted** workflows) over generic style rules ESLint already covers well.
+
 ## Prerequisites
 
 - **Node.js** 18 or newer (for `npm`, `esbuild` build, and running `node dist/cli.mjs`).
@@ -31,6 +33,8 @@ See [project-hierarchy.txt](./project-hierarchy.txt) for a concise map of direct
 This project follows the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Adding a new rule
+
+Ideas and acceptance criteria for future rules: [docs/RULE_BACKLOG.md](./docs/RULE_BACKLOG.md). Longer-term platform work: [docs/ROADMAP.md](./docs/ROADMAP.md).
 
 1. **Implement the rule** in `src/rules/` as a function that receives a `ts-morph` `SourceFile`, the parsed `ToreConfig`, and pushes `Violation` objects (see [`src/types/violation.ts`](./src/types/violation.ts)). Register it from [`src/rules/index.ts`](./src/rules/index.ts) inside `applyRulesToSourceFile`.
 

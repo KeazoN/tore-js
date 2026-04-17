@@ -6,6 +6,10 @@ import { fileURLToPath } from "node:url";
 export const PUBLISHED_CONFIG_SCHEMA_URL =
   "https://unpkg.com/@keazon/tore-js@latest/tore.config.schema.json";
 
+/** Presets shipped next to the CLI (`presets/<id>.json`). `default` uses the full example template. */
+export const INIT_PRESET_IDS = ["default", "next", "warn-first"] as const;
+export type InitPresetId = (typeof INIT_PRESET_IDS)[number];
+
 function rewriteSchemaForInitOutput(content: string): string {
   return content.replace(
     /"\$schema"\s*:\s*"\.\/tore\.config\.schema\.json"/,
@@ -31,25 +35,76 @@ export function resolvePublishedExampleConfigPath(): string {
   );
 }
 
-export function parseInitArgs(argv: string[]): { force: boolean } {
+function resolvePresetFilePath(filename: string): string {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const fromDist = join(here, "..", "presets", filename);
+  const fromSrcCli = join(here, "..", "..", "presets", filename);
+  if (existsSync(fromDist)) {
+    return fromDist;
+  }
+  if (existsSync(fromSrcCli)) {
+    return fromSrcCli;
+  }
+  throw new Error(
+    `Could not locate presets/${filename} next to the CLI. Is the package installed correctly?`,
+  );
+}
+
+export function resolveInitTemplatePath(preset: InitPresetId): string {
+  if (preset === "default") {
+    return resolvePublishedExampleConfigPath();
+  }
+  const filename = preset === "next" ? "next.json" : "warn-first.json";
+  return resolvePresetFilePath(filename);
+}
+
+export function parseInitArgs(argv: string[]): {
+  force: boolean;
+  preset: InitPresetId;
+} {
   let force = false;
-  for (const arg of argv) {
+  let preset: InitPresetId = "default";
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === undefined) {
+      continue;
+    }
     if (arg === "--force") {
       force = true;
       continue;
     }
+    if (arg === "--preset") {
+      const next = argv[i + 1];
+      if (!next || next.startsWith("--")) {
+        throw new Error('--preset requires a value (e.g. "default", "next", "warn-first").');
+      }
+      if (!INIT_PRESET_IDS.includes(next as InitPresetId)) {
+        throw new Error(
+          `Unknown preset "${next}". Valid presets: ${INIT_PRESET_IDS.join(", ")}.`,
+        );
+      }
+      preset = next as InitPresetId;
+      i++;
+      continue;
+    }
     throw new Error(`Unknown init argument: ${arg}`);
   }
-  return { force };
+  return { force, preset };
 }
 
-export async function runInit(options: { cwd: string; force: boolean }): Promise<void> {
+export async function runInit(options: {
+  cwd: string;
+  force: boolean;
+  preset?: InitPresetId;
+}): Promise<{ preset: InitPresetId }> {
+  const preset = options.preset ?? "default";
   const target = join(options.cwd, "tore.config.json");
   if (existsSync(target) && !options.force) {
     throw new Error(`${target} already exists. Pass --force to overwrite.`);
   }
-  const examplePath = resolvePublishedExampleConfigPath();
-  const raw = readFileSync(examplePath, "utf8");
+  const templatePath = resolveInitTemplatePath(preset);
+  const raw = readFileSync(templatePath, "utf8");
   const content = rewriteSchemaForInitOutput(raw);
   writeFileSync(target, content, "utf8");
+  return { preset };
 }
